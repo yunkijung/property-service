@@ -7,6 +7,7 @@ import com.loglrs.propertyservice.api.external_service.S3UploadService;
 import com.loglrs.propertyservice.api.house.dto.create_house.CreateHouseDto;
 import com.loglrs.propertyservice.api.house.dto.get_options.OfferHDto;
 import com.loglrs.propertyservice.api.house.dto.get_options.RuleHDto;
+import com.loglrs.propertyservice.api.house.dto.like_house.LikeHouseDto;
 import com.loglrs.propertyservice.api.house.dto.search_houses.HouseResponseDto;
 import com.loglrs.propertyservice.api.house.dto.search_houses.SearchHousesDto;
 import com.loglrs.propertyservice.api.house.dto.update_house.UpdateHouseForm;
@@ -268,5 +269,56 @@ public class HouseController {
         resultMap.put("totalCount", totalCount);
         resultMap.put("totalPage", totalPage);
         return new ResponseEntity(resultMap, HttpStatus.OK);
+    }
+
+
+    /////
+    @GetMapping("/business")
+    public ResponseEntity getMyHouses(@IfLogin LoginUserDto loginUserDto) {
+        Long memberId = loginUserDto.getMemberId();
+
+        List<House> houses = houseService.findAllByHost(memberId);
+
+        List<HouseResponseDto> responseDtos = new ArrayList<>();
+
+        //House data transfer
+        for (House house : houses) {
+            responseDtos.add(new HouseResponseDto(house));
+        }
+
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("houseList", responseDtos);
+
+        return new ResponseEntity(resultMap, HttpStatus.OK);
+    }
+
+    @PostMapping("/like")
+    public ResponseEntity likeHouse(@IfLogin LoginUserDto loginUserDto, @RequestBody @Valid LikeHouseDto likeHouseDto) {
+        houseComponentService.likeHouse(loginUserDto.getMemberId(), likeHouseDto.getHouseId());
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/like")
+    public ResponseEntity dislikeHouse(@IfLogin LoginUserDto loginUserDto, @RequestBody @Valid LikeHouseDto likeHouseDto) {
+        houseComponentService.dislikeHouse(loginUserDto.getMemberId(), likeHouseDto.getHouseId());
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("/like")
+    public ResponseEntity getAllLikeHouses(@IfLogin LoginUserDto loginUserDto) {
+
+        List<House> houses = houseComponentService.getLikeHousesByMemberId(loginUserDto.getMemberId());
+        List<HouseResponseDto> responseDtos = new ArrayList<>();
+
+        //House data transfer
+        for (House house : houses) {
+            responseDtos.add(new HouseResponseDto(house));
+        }
+
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("houseList", responseDtos);
+
+        return new ResponseEntity(resultMap, HttpStatus.OK);
+
     }
 }

@@ -6,6 +6,8 @@ import com.loglrs.propertyservice.domain.house.service.HouseService;
 import com.loglrs.propertyservice.domain.house_offer_h.entity.HouseOfferH;
 import com.loglrs.propertyservice.domain.house_rule_h.entity.HouseRuleH;
 import com.loglrs.propertyservice.domain.image.entity.Image;
+import com.loglrs.propertyservice.domain.member_house_like.entity.MemberHouseLike;
+import com.loglrs.propertyservice.domain.member_house_like.service.MemberHouseLikeService;
 import com.loglrs.propertyservice.domain.offer_h.entity.OfferH;
 import com.loglrs.propertyservice.domain.offer_h.service.OfferHService;
 import com.loglrs.propertyservice.domain.rule_h.entity.RuleH;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -24,6 +27,7 @@ public class HouseComponentService {
     private final HouseService houseService;
     private final OfferHService offerHService;
     private final RuleHService ruleHService;
+    private final MemberHouseLikeService memberHouseLikeService;
 
     @Transactional
     public House createHouse(House house, List<Image> images, List<Long> houseOfferIds, List<Long> houseRuleIds) {
@@ -130,5 +134,32 @@ public class HouseComponentService {
         );
 
         return house;
+    }
+
+    @Transactional
+    public void likeHouse(Long memberId, Long houseId) {
+
+        House house = houseService.findById(houseId);
+
+        MemberHouseLike memberHouseLike = new MemberHouseLike(house, memberId);
+
+        memberHouseLikeService.save(memberHouseLike);
+
+    }
+
+    @Transactional
+    public void dislikeHouse(Long memberId, Long houseId) {
+        memberHouseLikeService.deleteByMemberIdAndHouseId(memberId, houseId);
+    }
+
+    @Transactional
+    public List<House> getLikeHousesByMemberId(Long memberId) {
+        List<MemberHouseLike> likeHouses = memberHouseLikeService.findByMemberId(memberId);
+        List<House> houses = new ArrayList<>();
+        for (MemberHouseLike likeHouse : likeHouses) {
+            houses.add(likeHouse.getHouse());
+        }
+        return houses;
+
     }
 }
