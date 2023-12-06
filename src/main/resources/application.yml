@@ -23,7 +23,7 @@ spring:
   application:
     name: property-service
   profiles:
-    active: local
+    active: dev
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -74,3 +74,8 @@ cloud:
       accessKey: ${IAM_ACCESS_KEY}
       secretKey: ${IAM_SECRET_KEY}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans

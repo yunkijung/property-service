@@ -1,0 +1,22 @@
+package com.loglrs.propertyservice.domain.room.service;
+
+
+import com.loglrs.propertyservice.domain.room.entity.Room;
+import com.loglrs.propertyservice.domain.room.repository.RoomRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class RoomService {
+    private final RoomRepository roomRepository;
+
+    @Transactional
+    public Room save(Room room) {
+        return roomRepository.save(room);
+    }
+
+    @Transactional
+    public Room findById(Long id) { return roomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No result")); }
+}

@@ -1,0 +1,56 @@
+package com.loglrs.propertyservice.domain.house.service;
+
+
+import com.loglrs.propertyservice.domain.house.entity.House;
+import com.loglrs.propertyservice.domain.house.repository.HouseRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class HouseService {
+    private final HouseRepository houseRepository;
+
+    @Transactional
+    public House save(House house) {
+        return houseRepository.save(house);
+    }
+
+    @Transactional
+    public List<House> findAll() {
+        return houseRepository.findAll();
+    }
+
+    @Transactional
+    public House findById(Long id) {
+        return houseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Not exist."));
+    }
+
+    @Transactional
+    public List<House> findAllByHost(Long id) {
+        return houseRepository.findByHostId(id);
+    }
+
+    @Transactional
+    public List<House> search(Double lng, Double lat , Double distance) {
+        log.info("lng : {}", lng);
+        log.info("lat : {}", lat);
+        log.info("distance : {}", distance);
+
+        return houseRepository.search(lng, lat, distance);
+    }
+
+    @Transactional
+    public Page<House> searchByDistance(Double lng, Double lat, Double distance, String type, Integer minPrice, Integer maxPrice, Boolean hasBasement, LocalDate availableDate, Pageable pageable) {
+
+        return houseRepository.searchByDistance(lng, lat, distance, type, minPrice, maxPrice, hasBasement, availableDate, pageable);
+    }
+}
